@@ -79,6 +79,7 @@ app.get('/api/notes',(req,res) => {
 
 app.get('/api/notes/:id',(req,res) => {
     const result = filterById(req.params.id,notes);
+    console.log((parseInt(notes[notes.length -1].id) + 1).toString());
     if(result)
         res.json(result);
     else
@@ -86,7 +87,9 @@ app.get('/api/notes/:id',(req,res) => {
 });
 
 app.post('/api/notes',(req,res) => {
-    req.body.id = notes.length.toString();
+    //handling duplication of ids when it is deleted
+    //get id of last note and then increment by 1
+    req.body.id = (parseInt(notes[notes.length -1].id) + 1).toString()
     if(!validateNote(req.body))
         res.status(400).send('Given note is either null or in incorrect format');
     else{
