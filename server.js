@@ -9,7 +9,6 @@ const  notes = require('./db/db.json');
 const PORT = process.env.PORT || 3001;
 const fs = require('fs');
 const path = require('path');
-const { json } = require('express/lib/response');
 
 function filterbyQuery(query,notesArray){
     let filterResults = notesArray;
@@ -22,6 +21,11 @@ function filterbyQuery(query,notesArray){
 
 function filterByTitle(title,notesArray){
     const result = notesArray.filter(note => note.title === title)[0];
+    return result;
+}
+
+function filterById(id,notesArray){
+    const result = notesArray.filter(note => note.id === id)[0];
     return result;
 }
 
@@ -44,6 +48,20 @@ function validateNote(note){
     return true;
 }
 
+function deleteNote(id, notesArray){
+    const noteIndex = notesArray.findIndex(note => note.id === id);
+    notesArray.splice(noteIndex,1);
+    fs.writeFileSync(
+        path.join(__dirname,'./db/db.json'),
+        JSON.stringify(notesArray,null,2)
+    );    
+}
+
+function validateNoteId(id,notesArray){
+    const result = notesArray.filter(note => note.id === id).length > 0;
+    return result;
+}
+
 app.get('/api/notes',(req,res) => {
     let results = notes;
     if(req.query)
@@ -51,8 +69,16 @@ app.get('/api/notes',(req,res) => {
     res.json(results);
 });
 
-app.get('/api/notes/:title',(req,res) => {
-    const result = filterByTitle(req.params.title,notes);
+// app.get('/api/notes/:title',(req,res) => {
+//     const result = filterByTitle(req.params.title,notes);
+//     if(result)
+//         res.json(result);
+//     else
+//         res.send(404);
+// });
+
+app.get('/api/notes/:id',(req,res) => {
+    const result = filterById(req.params.id,notes);
     if(result)
         res.json(result);
     else
@@ -67,6 +93,15 @@ app.post('/api/notes',(req,res) => {
         const note = createNewNote(req.body,notes);
         res.json(note);
     }    
+});
+
+app.delete('/api/notes/:id',(req,res) => {    
+    if(!validateNoteId(req.params.id,notes))
+        res.status(400).send('Invalid note id');      
+    else {
+        deleteNote(req.params.id,notes);
+        res.send(`Deleted note with id: ${req.params.id}`);
+    }  
 });
 
 app.listen(PORT, () => {
