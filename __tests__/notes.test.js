@@ -96,27 +96,6 @@ test('test validateNote method', () => {
     expect(invalidTest3).toBe(false);
 });
 
-test('test validateNote method', () => {
-    const notes = [
-        {
-            id: 1,
-            title: 'TestNote1',
-            text: 'Note1 created for unit test purpose'
-        },
-        {
-            id: 2,
-            title: 'TestNote2',
-            text: 'Note2 created for unit test purpose'
-        },
-        {
-            id: 3,
-            title: 'TestNote3',
-            text: 'Note3 created for unit test purpose'
-        }
-    ];
-    const actualResult = validateNote()
-});
-
 test('test delete object', () => {
     const notes = [
         {
